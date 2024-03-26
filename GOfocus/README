@@ -1,0 +1,3 @@
+Run all models on FASTA file of sequences:
+
+csh seq_predcall.csh target.fasta
