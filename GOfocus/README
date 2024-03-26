@@ -3,4 +3,4 @@ Run all models on FASTA file of sequences:
 csh seq_predcall.csh target.fasta
 
 
-Neural network weights can be obtained from: https://liveuclac-my.sharepoint.com/:u:/g/personal/ucacdtj_ucl_ac_uk/EUyoHkIYja5ElHBk0WD-XYUBr2gEurQIWVpHiphJA_UVKg?e=qRgbkd
+Neural network weights can be obtained from: http://www0.cs.ucl.ac.uk/staff/D.Jones/GOfocus
