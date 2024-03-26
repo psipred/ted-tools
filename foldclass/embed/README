@@ -1,0 +1,40 @@
+Dependencies: NumPy, PyTorch
+
+
+Usage (all on GPU #1)
+
+
+Create search database and embeddings:
+
+python pytorch_foldclass_makedb.py -d cuda:1 -o mydatabase cathdomain1.pdb cathdomain2.pdb cathdomain3.pdb ...
+
+
+Evaluate novelty of domains:
+
+python pytorch_foldclass_anomaly.py -d cuda:1 -n mydatabase novel1.pdb novel2.pdb novel3.pdb ...
+
+
+Fast top-hit search for all domain matches using embedding rank and TMalign (tmalign should be in current PATH):
+
+python pytorch_foldclass_dbsearch.py -n mydatabase -k 1 -s -1 -m 0.5 -c 0.0 novel1.pdb novel2.pdb novel3.pdb ...
+
+
+Exhaustive search for all domain matches using embedding rank and TMalign (tmalign should be in current PATH):
+
+python pytorch_foldclass_dbsearch.py -n mydatabase -k 0 -s -1 -m 0.5 -c 0.6 novel1.pdb novel2.pdb novel3.pdb ...
+
+
+dbsearch output format:
+
+T1064-D1.pdb /data/cath/dompdb/3rpiB01 78 3.45 0.154 92 98 0.917004 0 0.53195
+
+ 1. Query file
+ 2. Target file
+ 3. Length of alignment
+ 4. RMSD
+ 5. Fraction sequence identity
+ 6. Query length
+ 7. Target length
+ 8. Cosine similarity of embedding
+ 9. Rank of match (0 = 1st)
+10: TM-score

@@ -1,0 +1,5 @@
+Dependencies: NumPy, PyTorch
+
+Usage (on GPU #1):
+
+python pytorch_foldclass_pred.py -d cuda:1 domain_model.pdb
