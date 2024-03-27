@@ -1,0 +1,1 @@
+This software is related to the paper "Exploring structural diversity across the protein universe with The Encyclopedia of Domains" by Lau, A. M., Bordin, N., Kandathil, S. M., Sillitoe, I., Waman, V. P., Wells, J., Orengo, C.A. and Jones, D.T.
