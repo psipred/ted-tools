@@ -1,4 +1,4 @@
-This is the "dom" program developed by Dr Willie Taylor and described in the following article:
+This is the "dom" program developed by Dr Willie Taylor (willietaylorwork@gmail.com) and described in the following article:
 William R. Taylor, Protein structural domain identification, Protein Engineering, Design and Selection, Volume 12, Issue 3, March 1999, Pages 203–216, https://doi.org/10.1093/protein/12.3.203
 
 
