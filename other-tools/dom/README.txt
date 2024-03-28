@@ -1,3 +1,7 @@
+This is the "dom" program developed by Dr Willie Taylor and described in the following article:
+William R. Taylor, Protein structural domain identification, Protein Engineering, Design and Selection, Volume 12, Issue 3, March 1999, Pages 203–216, https://doi.org/10.1093/protein/12.3.203
+
+
 Compiling:
 
 cc -O dom.c -o dom util/aa/cones.o util/aa/stutest.o util/aa/bestrot.o util/wt/util.o util/wt/sort.o util/wt/geom.o util/aa/pdbprot.o util/aa/matrix.o util/aa/siva.o util/aa/ql.o -lm
