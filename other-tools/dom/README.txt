@@ -1,26 +1,15 @@
-This is the "dom" program developed by Dr Willie Taylor (willietaylorwork@gmail.com) and described in the following article:
+This is the "dom" program written by Dr Willie Taylor (willietaylorwork@gmail.com) and described in the following article:
 William R. Taylor, Protein structural domain identification, Protein Engineering, Design and Selection, Volume 12, Issue 3, March 1999, Pages 203–216, https://doi.org/10.1093/protein/12.3.203
 
 
-Compiling:
+To compile just use make.
 
-cc -O dom.c -o dom util/aa/cones.o util/aa/stutest.o util/aa/bestrot.o util/wt/util.o util/wt/sort.o util/wt/geom.o util/aa/pdbprot.o util/aa/matrix.o util/aa/siva.o util/aa/ql.o -lm
-
-#include <alloca.h>
-#include "util/wt/incl/util.h"
-#include "util/wt/incl/geom.h"
-#include "util/aa/incl/pdbprot.h"
-#include "util/aa/incl/matplot.h"
-#include "util/aa/incl/matrix.h"
-
-Most of the call to the util routines seem to be for calculating inertial axes.
-I can't see where so they can probably be dropped.
 
 Running:
 
 ./dom pdb-file [spread nruns subdoms]
 
-pdb-file can be full of CA (just CAs used)
+pdb-file can contain just C-alpha coordinates
 
 spread = granularity level (default 15)
 
