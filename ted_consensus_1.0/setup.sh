@@ -1,0 +1,72 @@
+#!/bin/bash
+
+# This file is a part of TED: The Encyclopedia of Domains. If you utilize or reference any content from this file, 
+# please cite the following paper:
+
+# Lau et al., 2024. Exploring structural diversity across the protein universe with The Encyclopedia of Domains.
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+# Define the name of the virtual environment directory
+VENV_DIR="ted_consensus"
+WEIGHTS_DIR="${SCRIPT_DIR}/programs/merizo/weights"
+
+# Define base URL and weights files in an array
+BASE_URL="https://github.com/psipred/Merizo/raw/main/weights"
+WEIGHTS_FILES=("weights_part_0.pt" "weights_part_1.pt" "weights_part_2.pt")
+
+# Check if Python is installed
+if ! command -v python3 &> /dev/null
+then
+    echo "Python 3 is not installed. Please install Python 3 and try again."
+    exit 1
+fi
+
+# Check if pip is installed
+if ! command -v pip3 &> /dev/null
+then
+    echo "pip is not installed. Please install pip and try again."
+    exit 1
+fi
+
+# Create a virtual environment
+if [ ! -d "$VENV_DIR" ]; then
+    echo "Creating virtual environment..."
+    python3 -m venv $VENV_DIR
+else
+    echo "Virtual environment already exists."
+fi
+
+# Activate the virtual environment
+source $VENV_DIR/bin/activate
+
+# Upgrade pip to the latest version
+echo "Upgrading pip..."
+pip install --upgrade pip
+
+# Install dependencies from requirements.txt
+if [ -f "requirements.txt" ]; then
+    echo "Installing dependencies from requirements.txt..."
+    pip install -r requirements.txt
+else
+    echo "requirements.txt not found. Please make sure it exists in the current directory."
+    exit 1
+fi
+
+# Check if the weights directory exists
+if [ -d "$WEIGHTS_DIR" ]; then
+    echo "programs/merizo/weights exists. Checking for missing weights files..."
+else
+    echo "programs/merizo/weights directory not found. Creating directory..."
+    mkdir -p "$WEIGHTS_DIR"
+fi
+
+# Download missing weights files
+for WEIGHT_FILE in "${WEIGHTS_FILES[@]}"; do
+    FILE_PATH="${WEIGHTS_DIR}/${WEIGHT_FILE}"
+    if [ ! -f "$FILE_PATH" ]; then
+        wget -O "$FILE_PATH" "${BASE_URL}/${WEIGHT_FILE}"
+    fi
+done
+
+echo "Successfully set up ted_consensus"
