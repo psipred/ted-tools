@@ -115,7 +115,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
         read -p "Press enter after Xcode Command Line Tools installation is complete"
     fi
 
-    cd "${SCRIPT_DIR}/programs/stride" || exit
+    cd "${SCRIPT_DIR}/programs/chainsaw/stride" || exit
     # Remove all files except stride.tgz
     find . -type f ! -name 'stride.tgz' -delete
     # Extract the contents of stride.tgz
