@@ -1,0 +1,25 @@
+Running chainsaw on targets in /home/andy/TED_science_review/programs/test2/ted-tools/ted_consensus_1.0/example
+08/27/2024 02:48:00 PM | INFO | Using device: cuda
+08/27/2024 02:48:00 PM | INFO | Learner kwargs: {'max_recycles': 1, 'save_val_best': True, 'x_has_padding_mask': False, 'remove_disordered_domain_threshold': 0.35, 'post_process_domains': True, 'min_ss_components': 2, 'min_domain_length': 30}
+08/27/2024 02:48:00 PM | INFO | Loading weights from: /home/andy/TED_science_review/programs/test2/ted-tools/ted_consensus_1.0/programs/chainsaw/saved_models/secondary_structure_epoch17/version_2/weights.pt
+08/27/2024 02:48:00 PM | INFO | Making prediction for file AF-A0A0N5ATQ5-F1-model_v4.pdb (chain 'AF-A0A0N5ATQ5-F1-model_v4')
+08/27/2024 02:48:00 PM | INFO | Running command: /home/andy/TED_science_review/programs/test2/ted-tools/ted_consensus_1.0/programs/chainsaw/stride/stride /home/andy/TED_science_review/programs/test2/ted-tools/ted_consensus_1.0/example/AF-A0A0N5ATQ5-F1-model_v4_renum.pdb -rA
+08/27/2024 02:48:00 PM | INFO | Distance matrix shape: (1, 502, 502), SS matrix shape: (502, 502)
+08/27/2024 02:48:01 PM | INFO | Runtime: 0.661s
+08/27/2024 02:48:01 PM | INFO | Making prediction for file AF-A0A1V6M2Y0-F1-model_v4.pdb (chain 'AF-A0A1V6M2Y0-F1-model_v4')
+08/27/2024 02:48:01 PM | INFO | Running command: /home/andy/TED_science_review/programs/test2/ted-tools/ted_consensus_1.0/programs/chainsaw/stride/stride /home/andy/TED_science_review/programs/test2/ted-tools/ted_consensus_1.0/example/AF-A0A1V6M2Y0-F1-model_v4_renum.pdb -rA
+08/27/2024 02:48:01 PM | INFO | Distance matrix shape: (1, 1272, 1272), SS matrix shape: (1272, 1272)
+08/27/2024 02:48:09 PM | INFO | Runtime: 7.701s
+08/27/2024 02:48:09 PM | INFO | Making prediction for file AF-A0A1X0B8H0-F1-model_v4.pdb (chain 'AF-A0A1X0B8H0-F1-model_v4')
+08/27/2024 02:48:09 PM | INFO | Running command: /home/andy/TED_science_review/programs/test2/ted-tools/ted_consensus_1.0/programs/chainsaw/stride/stride /home/andy/TED_science_review/programs/test2/ted-tools/ted_consensus_1.0/example/AF-A0A1X0B8H0-F1-model_v4_renum.pdb -rA
+08/27/2024 02:48:09 PM | INFO | Distance matrix shape: (1, 686, 686), SS matrix shape: (686, 686)
+08/27/2024 02:48:09 PM | INFO | Runtime: 0.376s
+08/27/2024 02:48:09 PM | INFO | Making prediction for file AF-A0A6C0L9V9-F1-model_v4.pdb (chain 'AF-A0A6C0L9V9-F1-model_v4')
+08/27/2024 02:48:09 PM | INFO | Running command: /home/andy/TED_science_review/programs/test2/ted-tools/ted_consensus_1.0/programs/chainsaw/stride/stride /home/andy/TED_science_review/programs/test2/ted-tools/ted_consensus_1.0/example/AF-A0A6C0L9V9-F1-model_v4_renum.pdb -rA
+08/27/2024 02:48:09 PM | INFO | Distance matrix shape: (1, 421, 421), SS matrix shape: (421, 421)
+08/27/2024 02:48:09 PM | INFO | Runtime: 0.174s
+08/27/2024 02:48:09 PM | INFO | Making prediction for file AF-A0A6C0LIE9-F1-model_v4.pdb (chain 'AF-A0A6C0LIE9-F1-model_v4')
+08/27/2024 02:48:09 PM | INFO | Running command: /home/andy/TED_science_review/programs/test2/ted-tools/ted_consensus_1.0/programs/chainsaw/stride/stride /home/andy/TED_science_review/programs/test2/ted-tools/ted_consensus_1.0/example/AF-A0A6C0LIE9-F1-model_v4_renum.pdb -rA
+08/27/2024 02:48:09 PM | INFO | Distance matrix shape: (1, 304, 304), SS matrix shape: (304, 304)
+08/27/2024 02:48:09 PM | INFO | Runtime: 0.122s
+08/27/2024 02:48:09 PM | INFO | DONE
