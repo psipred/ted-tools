@@ -13,8 +13,8 @@ These directories contain scripts used to conduct the analyses of Interacting Su
 - TM-align (we used the C++ version from [here](https://zhanggroup.org/TM-align/))
 - Python >= 3.10
   - biopython >= 1.80
-    - numpy < 2.0.0
-    - tqdm
+  - numpy < 2.0.0
+  - tqdm
 - R >= 4.0.0
   - beanplot
   - reticulate
