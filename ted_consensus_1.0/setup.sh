@@ -105,4 +105,25 @@ else
     cp "scripts/Run_UniDoc_from_scratch_structure_afdb.py" "${UNIDOC_DIR}/"
 fi
 
+# if running on macOS install compiler tools and compile stride from source:
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS only
+    if ! command -v gcc &> /dev/null || ! command -v make &> /dev/null; then
+        echo "Installing Xcode Command Line Tools..."
+        xcode-select --install
+        # Wait for installation to complete or prompt user to press enter after installation
+        read -p "Press enter after Xcode Command Line Tools installation is complete"
+    fi
+
+    cd "${SCRIPT_DIR}/programs/stride" || exit
+    # Remove all files except stride.tgz
+    find . -type f ! -name 'stride.tgz' -delete
+    # Extract the contents of stride.tgz
+    tar -zxf stride.tgz
+    # Compile stride
+    make
+    # Change back to the original directory
+    cd - || exit
+fi
+
 echo "Successfully set up ted_consensus"
