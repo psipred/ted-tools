@@ -121,6 +121,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     # Extract the contents of stride.tgz
     tar -zxf stride.tgz
     # Compile stride
+    echo "Compiling stride for MacOS..."
     make
     # Change back to the original directory
     cd - || exit
