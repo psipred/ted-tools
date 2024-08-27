@@ -1,8 +1,7 @@
 #!/bin/bash
 
-# This file is a part of TED: The Encyclopedia of Domains. If you utilize or reference any content from this file, 
+# This file is a part of TED: The Encyclopedia of Domains. If you utilize or reference any content from this file,
 # please cite the following paper:
-
 # Lau et al., 2024. Exploring structural diversity across the protein universe with The Encyclopedia of Domains.
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
@@ -10,15 +9,35 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 # Define the name of the virtual environment directory
 VENV_DIR="ted_consensus"
 WEIGHTS_DIR="${SCRIPT_DIR}/programs/merizo/weights"
+UNIDOC_DIR="${SCRIPT_DIR}/programs/unidoc"
 
 # Define base URL and weights files in an array
 BASE_URL="https://github.com/psipred/Merizo/raw/main/weights"
 WEIGHTS_FILES=("weights_part_0.pt" "weights_part_1.pt" "weights_part_2.pt")
 
-# Check if Python is installed
-if ! command -v python3 &> /dev/null
-then
-    echo "Python 3 is not installed. Please install Python 3 and try again."
+# UniDoc package download URL
+UNIDOC_URL="https://yanglab.qd.sdu.edu.cn/UniDoc/download/UniDoc.tgz"
+UNIDOC_TGZ="${SCRIPT_DIR}/programs/unidoc.tgz"
+
+# Function to check Python version
+check_python_version() {
+    PYTHON_VERSION=$($1 -c "import sys; print('.'.join(map(str, sys.version_info[:3])))")
+    if [[ $PYTHON_VERSION == 3.1[01]* ]]; then
+        echo $1
+        return 0
+    else
+        return 1
+    fi
+}
+
+# Check for Python 3.11 or 3.10
+PYTHON_COMMAND=""
+if check_python_version python3.11; then
+    PYTHON_COMMAND="python3.11"
+elif check_python_version python3.10; then
+    PYTHON_COMMAND="python3.10"
+else
+    echo "Python 3.10 or 3.11 is required but not found. Please install Python 3.10 or 3.11 and try again."
     exit 1
 fi
 
@@ -32,7 +51,7 @@ fi
 # Create a virtual environment
 if [ ! -d "$VENV_DIR" ]; then
     echo "Creating virtual environment..."
-    python3 -m venv $VENV_DIR
+    $PYTHON_COMMAND -m venv $VENV_DIR
 else
     echo "Virtual environment already exists."
 fi
@@ -68,5 +87,22 @@ for WEIGHT_FILE in "${WEIGHTS_FILES[@]}"; do
         wget -O "$FILE_PATH" "${BASE_URL}/${WEIGHT_FILE}"
     fi
 done
+
+# Check if the unidoc directory exists
+if [ -d "$UNIDOC_DIR" ]; then
+    echo "programs/unidoc directory already exists."
+else
+    if test ! -f "${UNIDOC_TGZ}"; then
+        echo "programs/unidoc directory not found. Downloading UniDoc ..."
+        wget -O "${UNIDOC_TGZ}" "${UNIDOC_URL}"
+    fi
+
+    echo "Unpacking UniDoc package..."
+    tar -xzvf "${UNIDOC_TGZ}" -C "${SCRIPT_DIR}/programs"
+    mv "${SCRIPT_DIR}/programs/UniDoc" "${SCRIPT_DIR}/programs/unidoc"
+
+    # Copy the extra run script over to the unidoc dir
+    cp -t "${UNIDOC_DIR}/" "scripts/Run_UniDoc_from_scratch_structure_afdb.py"
+fi
 
 echo "Successfully set up ted_consensus"
