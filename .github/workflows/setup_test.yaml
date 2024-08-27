@@ -30,7 +30,7 @@ jobs:
 
     - name: Verify stride installation
       run: |
-        if [ -f "./programs/stride/stride" ]; then
+        if [ -f "./programs/chainsaw/stride/stride" ]; then
           echo "Stride file exists"
         else
           echo "Stride compilation failed"
