@@ -55,7 +55,7 @@ case $method in
     ;;
   "chainsaw")
     RUN_SCRIPT="${PROG_DIR}/chainsaw/get_predictions.py"
-    OFFSET_RESI=2
+    OFFSET_RESI=1
     ;;
   *)
     echo "Invalid method: ${method}. Allowed options are 'merizo', 'unidoc', or 'chainsaw'."
