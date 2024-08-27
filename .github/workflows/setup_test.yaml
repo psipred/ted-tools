@@ -1,10 +1,6 @@
 name: Setup Test
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -30,6 +26,7 @@ jobs:
 
     - name: Verify stride installation
       run: |
+        pwd
         if [ -f "./programs/chainsaw/stride/stride" ]; then
           echo "Stride file exists"
         else
