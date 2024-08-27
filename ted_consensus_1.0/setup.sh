@@ -123,6 +123,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     # Compile stride
     echo "Compiling stride for MacOS..."
     make
+    chmod +x stride
     # Change back to the original directory
     cd - || exit
 fi
