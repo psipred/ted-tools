@@ -12,10 +12,10 @@ Lau et al., 2024. Exploring structural diversity across the protein universe wit
 
 Contents:
 ```
-domain_consensus
+ted_consensus_1.0
 ├── README.md
 ├── run_segmentation.sh
-|
+├── setup.sh
 ├── example
 │   └── AF-A0A1V6M2Y0-F1-model_v4.pdb
 |
@@ -30,7 +30,7 @@ domain_consensus
 └── programs/
     ├── chainsaw
     ├── Merizo
-    └── UniDoc
+    └── UniDoc  # downloaded by setup.sh
 ```
 
 The main program that runs domain segmentation and consensus calculation is `run_segmentation.sh`.

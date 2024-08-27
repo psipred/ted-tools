@@ -102,7 +102,7 @@ else
     mv "${SCRIPT_DIR}/programs/UniDoc" "${SCRIPT_DIR}/programs/unidoc"
 
     # Copy the extra run script over to the unidoc dir
-    cp -t "${UNIDOC_DIR}/" "scripts/Run_UniDoc_from_scratch_structure_afdb.py"
+    cp "scripts/Run_UniDoc_from_scratch_structure_afdb.py" "${UNIDOC_DIR}/"
 fi
 
 echo "Successfully set up ted_consensus"
