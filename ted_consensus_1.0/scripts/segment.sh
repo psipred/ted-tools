@@ -71,7 +71,7 @@ echo "Running ${method} on targets in ${inputs}"
 # Each method will take the list containing the paths to the targets
 if [ "${method}" = "merizo" ] || [ "${method}" = "unidoc" ]; then
     target_list="${output%/}targets.txt"
-    readlink -f "${inputs}/"*.pdb > "${target_list}"
+    find "${inputs}/" -type f -name "*.pdb" -printf "%p\n" > "${target_list}"
 
     if [[ ${custom_chopping} == '' ]]; then
         ${py} "${RUN_SCRIPT}" -l "${target_list}" --out "${output_file}"
