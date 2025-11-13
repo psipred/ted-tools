@@ -1,0 +1,10 @@
+*.pyc
+__pycache__/
+*.o
+ted_consensus_1.0/ted_consensus/
+ted_consensus_1.0/programs/unidoc.tgz
+ted_consensus_1.0/example2_output
+ted_consensus_1.0/programs/merizo/weights/weights_*.pt
+ted_consensus_1.0/programs/unidoc/example
+ted_consensus_1.0/programs/unidoc/Run_UniDoc_from_scratch_structure_afdb.py
+*.bak

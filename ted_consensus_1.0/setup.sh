@@ -4,6 +4,8 @@
 # please cite the following paper:
 # Lau et al., 2024. Exploring structural diversity across the protein universe with The Encyclopedia of Domains.
 
+set -e -o pipefail
+
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 # Define the name of the virtual environment directory
@@ -16,7 +18,7 @@ BASE_URL="https://github.com/psipred/Merizo/raw/main/weights"
 WEIGHTS_FILES=("weights_part_0.pt" "weights_part_1.pt" "weights_part_2.pt")
 
 # UniDoc package download URL
-UNIDOC_URL="https://yanglab.qd.sdu.edu.cn/UniDoc/download/UniDoc.tgz"
+UNIDOC_URL="https://yanglab.qd.sdu.edu.cn/UniDoc/download/UniDoc_20251022.tgz"
 UNIDOC_TGZ="${SCRIPT_DIR}/programs/unidoc.tgz"
 
 # Function to check Python version
@@ -64,9 +66,9 @@ echo "Upgrading pip..."
 pip install --upgrade pip
 
 # Install dependencies from requirements.txt
-if [ -f "requirements.txt" ]; then
+if [ -f "${SCRIPT_DIR}/requirements.txt" ]; then
     echo "Installing dependencies from requirements.txt..."
-    pip install -r requirements.txt
+    pip install -r "${SCRIPT_DIR}/requirements.txt"
 else
     echo "requirements.txt not found. Please make sure it exists in the current directory."
     exit 1
@@ -88,44 +90,84 @@ for WEIGHT_FILE in "${WEIGHTS_FILES[@]}"; do
     fi
 done
 
-# Check if the unidoc directory exists
-if [ -d "$UNIDOC_DIR" ]; then
-    echo "programs/unidoc directory already exists."
+# No longer download UniDoc automatically - MIT license now allows us to inline
+#
+# # Check if the unidoc directory exists
+# if [ -d "$UNIDOC_DIR" ]; then
+#     echo "programs/unidoc directory already exists."
+# else
+#     if test ! -f "${UNIDOC_TGZ}"; then
+#         echo "programs/unidoc directory not found. Downloading UniDoc ..."
+#         wget --no-check-certificate -O "${UNIDOC_TGZ}" "${UNIDOC_URL}"
+#     fi
+
+#     echo "Unpacking UniDoc package..."
+#     tar -xzvf "${UNIDOC_TGZ}" -C "${SCRIPT_DIR}/programs"
+#     mv "${SCRIPT_DIR}/programs/UniDoc" "${SCRIPT_DIR}/programs/unidoc"
+# fi
+
+# Copy the extra run script over to the unidoc dir
+cp "${SCRIPT_DIR}/scripts/Run_UniDoc_from_scratch_structure_afdb.py" "${UNIDOC_DIR}/"
+
+
+# check to see if the stride binary runs
+# with a zero exit code, if not compile it
+STRIDE_BIN="${UNIDOC_DIR}/bin/stride"
+if "${STRIDE_BIN}" > /dev/null 2>&1; then
+    echo "Stride binary found."
 else
-    if test ! -f "${UNIDOC_TGZ}"; then
-        echo "programs/unidoc directory not found. Downloading UniDoc ..."
-        wget -O "${UNIDOC_TGZ}" "${UNIDOC_URL}"
+    rc=$?
+    echo "Stride binary failed (exit code ${rc})."
+
+    # if running on macOS install compiler tools and compile stride from source:
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS only
+        if ! command -v gcc &> /dev/null || ! command -v make &> /dev/null; then
+            echo "Installing Xcode Command Line Tools..."
+            xcode-select --install
+            # Wait for installation to complete or prompt user to press enter after installation
+            read -p "Press enter after Xcode Command Line Tools installation is complete"
+        fi
     fi
 
-    echo "Unpacking UniDoc package..."
-    tar -xzvf "${UNIDOC_TGZ}" -C "${SCRIPT_DIR}/programs"
-    mv "${SCRIPT_DIR}/programs/UniDoc" "${SCRIPT_DIR}/programs/unidoc"
-
-    # Copy the extra run script over to the unidoc dir
-    cp "scripts/Run_UniDoc_from_scratch_structure_afdb.py" "${UNIDOC_DIR}/"
-fi
-
-# if running on macOS install compiler tools and compile stride from source:
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    # macOS only
-    if ! command -v gcc &> /dev/null || ! command -v make &> /dev/null; then
-        echo "Installing Xcode Command Line Tools..."
-        xcode-select --install
-        # Wait for installation to complete or prompt user to press enter after installation
-        read -p "Press enter after Xcode Command Line Tools installation is complete"
-    fi
-
+    ORIG_DIR=$(pwd)
     cd "${SCRIPT_DIR}/programs/chainsaw/stride" || exit
     # Remove all files except stride.tgz
     find . -type f ! -name 'stride.tgz' -delete
     # Extract the contents of stride.tgz
     tar -zxf stride.tgz
     # Compile stride
-    echo "Compiling stride for MacOS..."
+    echo "Compiling stride..."
     make
     chmod +x stride
-    # Change back to the original directory
-    cd - || exit
+
+    echo "Copying compiled stride to unidoc bin directory..."
+    cp stride "${STRIDE_BIN}"
+
+    cd "${ORIG_DIR}"
 fi
+
+# check to see if the UniDoc_struct binary runs
+# with a zero exit code, if not compile it
+UNIDOC_STRUCT_BIN="${UNIDOC_DIR}/bin/UniDoc_struct"
+if "${UNIDOC_STRUCT_BIN}" > /dev/null 2>&1; then
+    echo "UniDoc_struct binary found."
+else
+    rc=$?
+    echo "UniDoc_struct binary failed (exit code ${rc})."
+
+    # Compile UniDoc_struct
+    echo "Compiling UniDoc_struct from src..."
+    ORIG_DIR=$(pwd)
+    cd "${UNIDOC_DIR}/src"
+    rm -f "${UNIDOC_STRUCT_BIN}"
+    # patch to remove all includes for malloc.h
+    sed -i.bak '/#include <malloc.h>/d' *.h
+    g++ -std=c++0x   -O3 -ffast-math -lm -o "${UNIDOC_STRUCT_BIN}" UniDoc_struct.cpp
+
+    # Change back to the original directory
+    cd "${ORIG_DIR}"
+fi
+
 
 echo "Successfully set up ted_consensus"
