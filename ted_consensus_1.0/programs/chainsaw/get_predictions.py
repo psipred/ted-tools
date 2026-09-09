@@ -94,9 +94,9 @@ def load_model(*,
     return learner
 
 
-def predict(model, pdb_path, renumber_pdbs=True, ss_mod=False, pdbchain="A") -> List[PredictionResult]:
+def predict(model, pdb_path, renumber_pdbs=True, ss_mod=False, pdbchain="A") -> PredictionResult:
     """
-    Makes the prediction and returns a list of PredictionResult objects
+    Makes the prediction and returns a PredictionResult object
     """
     start = time.time()
 
