@@ -12,9 +12,11 @@ User can provide any of the following as an input to get predictions:
 
 import argparse
 import csv
+import datetime
 import hashlib
 import logging
 import os
+import resource
 import sys
 import time
 from pathlib import Path
@@ -33,6 +35,35 @@ from src.utils.pymol_3d_visuals import generate_pymol_image
 LOG = logging.getLogger(__name__)
 OUTPUT_COLNAMES = ['chain_id', 'sequence_md5', 'nres', 'ndom', 'chopping', 'uncertainty']
 ACCEPTED_STRUCTURE_FILE_SUFFIXES = ['.pdb', '.cif']
+
+
+def get_memory_mb():
+    try:
+        with open('/proc/self/status') as handle:
+            for line in handle:
+                if line.startswith('VmRSS:'):
+                    return int(line.split()[1]) / 1024
+    except OSError:
+        pass
+
+    maxrss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    if sys.platform == 'darwin':
+        return maxrss / (1024 * 1024)
+    return maxrss / 1024
+
+
+def log_model_memory(program, file_index, file_name, nres, runtime):
+    timestamp = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    LOG.info(
+        "TED_MEMORY\t"
+        f"timestamp={timestamp}\t"
+        f"program={program}\t"
+        f"file_index={file_index}\t"
+        f"file_name={file_name}\t"
+        f"nres={nres}\t"
+        f"rss_mb={get_memory_mb():.1f}\t"
+        f"runtime_s={runtime:.3f}"
+    )
 
 
 def setup_logging():
@@ -207,12 +238,14 @@ def main(args):
 
     if input_method == 'structure_directory':
         structure_dir = args.structure_directory
+        file_index = 0
         for idx, fname in enumerate(os.listdir(structure_dir)):
             suffix = Path(fname).suffix
             LOG.debug(f"Checking file {fname} (suffix: {suffix}) ..")
             if suffix not in ACCEPTED_STRUCTURE_FILE_SUFFIXES:
                 continue
 
+            file_index += 1
             chain_id = Path(fname).stem
             result_exists = prediction_results_file.has_result_for_chain_id(chain_id)
             if result_exists:
@@ -227,8 +260,10 @@ def main(args):
                 continue
 
             LOG.info(f"Making prediction for file {fname} (chain '{chain_id}')")
+            start = time.time()
             result = predict(model, pdb_path, ss_mod=args.ss_mod)
             prediction_results_file.add_result(result)
+            log_model_memory('chainsaw', file_index, fname, result.nres, time.time() - start)
             if args.pymol_visual:
                 generate_pymol_image(
                     pdb_path=str(result.pdb_path),
@@ -239,8 +274,10 @@ def main(args):
                     pymol_executable=constants.PYMOL_EXE,
                 )
     elif input_method == 'structure_file':
+        start = time.time()
         result = predict(model, args.structure_file, ss_mod=args.ss_mod)
         prediction_results_file.add_result(result)
+        log_model_memory('chainsaw', 1, Path(args.structure_file).name, result.nres, time.time() - start)
         if args.pymol_visual:
             generate_pymol_image(
                 pdb_path=str(result.pdb_path),

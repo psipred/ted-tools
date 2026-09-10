@@ -1,10 +1,13 @@
 from __future__ import annotations
 
-import os
 import argparse
+import datetime
+import os
+import resource
+import sys
 import textwrap
-import zipfile
 import time
+import zipfile
 
 from scipy.optimize import linear_sum_assignment
 
@@ -36,6 +39,42 @@ DOM_AVE = 250           # half of the average domain size of CATH / for iteratio
 CONF_THRESHOLD = 0.95   # minimum domain confidence / for iteration mode
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
+
+def get_memory_mb():
+    try:
+        with open('/proc/self/status') as handle:
+            for line in handle:
+                if line.startswith('VmRSS:'):
+                    return int(line.split()[1]) / 1024
+    except OSError:
+        pass
+
+    maxrss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    if sys.platform == 'darwin':
+        return maxrss / (1024 * 1024)
+    return maxrss / 1024
+
+
+def log_model_memory(program, file_index, file_name, nres, runtime, device):
+    timestamp = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    fields = [
+        "TED_MEMORY",
+        f"timestamp={timestamp}",
+        f"program={program}",
+        f"file_index={file_index}",
+        f"file_name={file_name}",
+        f"nres={nres}",
+        f"rss_mb={get_memory_mb():.1f}",
+        f"runtime_s={runtime:.3f}",
+        f"device={device}",
+    ]
+    if device.type == "cuda":
+        fields.extend([
+            f"cuda_allocated_mb={torch.cuda.memory_allocated(device) / (1024 * 1024):.1f}",
+            f"cuda_reserved_mb={torch.cuda.memory_reserved(device) / (1024 * 1024):.1f}",
+        ])
+    print("\t".join(fields), file=sys.stderr, flush=True)
+
 
 def iterative_segmentation(
         network: torch.nn.Module, 
@@ -237,7 +276,7 @@ def merge_doms(domain_ids, dm, ri, max_merge, d0=8.0, d=1.5, alpha=0.43, beta=0.
     
     return domain_ids_, n_merge
 
-def segment(network, args, pdb_path, device, zipped, outfile):
+def segment(network, args, pdb_path, device, zipped, outfile, file_index):
     
     start_time = time.time()
     
@@ -359,6 +398,7 @@ def segment(network, args, pdb_path, device, zipped, outfile):
             # end_time,
             # device_name,
         ))
+    log_model_memory("merizo", file_index, pdb_name, nres, end_time, device)
 
 
 def main():
@@ -445,24 +485,24 @@ def main():
     network.eval()
 
     failed = []
-    for pdb_path in files:
+    for file_index, pdb_path in enumerate(files, start=1):
         try:  
             with torch.no_grad():
-                segment(network, args, pdb_path, device, zipped=zipped, outfile=args.outfile)
+                segment(network, args, pdb_path, device, zipped=zipped, outfile=args.outfile, file_index=file_index)
         except Exception as e:
             print(f"Failed: {pdb_path} (Exception: {e})")
             # continue
             if args.device == 'cuda':
-                failed.append(pdb_path)
+                failed.append((file_index, pdb_path))
 
     if args.device == 'cuda': # Re-try failed models on CPU
         device = torch.device("cpu")
         network = network.to(device)
-        for pdb_path in failed:
+        for file_index, pdb_path in failed:
 
             try: 
                 with torch.no_grad():
-                    segment(network, args, pdb_path, device, zipped=zipped, outfile=args.outfile)
+                    segment(network, args, pdb_path, device, zipped=zipped, outfile=args.outfile, file_index=file_index)
             except Exception as e:
                 print(f"{os.path.basename(pdb_path)}\tSegmentation failed even on CPU (Exception: {e})")
                 raise
